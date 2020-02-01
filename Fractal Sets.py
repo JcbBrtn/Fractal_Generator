@@ -5,48 +5,53 @@ import numpy as np
 def createFractal():
     xRange = 3
     yRange = 2
-    fract = Image.new('RGBA', (6000,4000))
-    Picture_Width, Picture_Height = fract.size
-    Pixels_Per_Xunit = Picture_Width/(2*xRange)
-    Pixels_Per_Yunit = Picture_Height/(2*yRange)
-    aStart = a = bStart = b = 0
-    memory = []
-    zMemory = []
-    color = (0,0,0)
-    distance = -1
-    
-    
+    XPixels = 6000
+    YPixels = 4000
+    if xRange/yRange == XPixels/YPixels:
+        fract = Image.new('RGBA', (XPixels, YPixels))
+        Picture_Width, Picture_Height = fract.size
+        Pixels_Per_Xunit = Picture_Width/(2*xRange)
+        Pixels_Per_Yunit = Picture_Height/(2*yRange)
+        aStart = a = bStart = b = 0
+        memory = []
+        zMemory = []
+        color = (0,0,0)
+        distance = -1
+        
+        
 
-    for x in range(Picture_Width):
-        for y in range(Picture_Height):
-            aStart = a = 1.0 * x/(Pixels_Per_Xunit) - xRange
-            bStart = b = -1.0*y/(Pixels_Per_Yunit) + yRange
-            count = 0
-            memory = []
-            zMemory = []
-            color = (0, 0, 0)
-            distance = -1
-            
-            while(count < 25 and (distance < 500) and not((a,b) in memory)):
-                #print(aStart, bStart, a , b , distance)
-                memory.append((a,b))
-                distance = findMagnitude(a,b)
-                zMemory.append(distance)
-                a, b = FractalFunction(a, b, aStart, bStart)
-                count+=1
+        for x in range(Picture_Width):
+            for y in range(Picture_Height):
+                aStart = a = 1.0 * x/(Pixels_Per_Xunit) - xRange
+                bStart = b = -1.0*y/(Pixels_Per_Yunit) + yRange
+                count = 0
+                memory = []
+                zMemory = []
+                color = (0, 0, 0)
+                distance = -1
+                
+                while(count < 25 and (distance < 500) and not((a,b) in memory)):
+                    #print(aStart, bStart, a , b , distance)
+                    memory.append((a,b))
+                    distance = findMagnitude(a,b)
+                    zMemory.append(distance)
+                    a, b = FractalFunction(a, b, aStart, bStart)
+                    count+=1
 
-            if (a,b) in memory:
-                color = (255, 0, 255)
-            elif distance >= 200:
-                rate = (zMemory[-1]/zMemory[-2])/200
-                if(rate > 1):
-                    rate = 1
-                color = (int(255), int(255 * rate), int(255))
-            else:
-                color = (0,0,0)
-            fract.putpixel((x, y), color)
-    fract.save("Fractal.png")
-    fract.show()
+                if (a,b) in memory:
+                    color = (255, 0, 255)
+                elif distance >= 200:
+                    rate = (zMemory[-1]/zMemory[-2])/200
+                    if(rate > 1):
+                        rate = 1
+                    color = (int(255), int(255 * rate), int(255))
+                else:
+                    color = (0,0,0)
+                fract.putpixel((x, y), color)
+        fract.save("Fractal.png")
+        fract.show()
+    else:
+        print('Please make sure the Ratio of Pixels to Range is equal for best picture quality')
 
 def FractalFunction(x, y, zx_0, zy_0):
     """
