@@ -5,8 +5,8 @@ import numpy as np
 def createFractal():
     xRange = 3
     yRange = 2
-    XPixels = 6000
-    YPixels = 4000
+    XPixels = 3000
+    YPixels = 2000
     fract = Image.new('RGBA', (XPixels, YPixels))
     Picture_Width, Picture_Height = fract.size
     Pixels_Per_Xunit = Picture_Width/(2*xRange)
@@ -36,12 +36,12 @@ def createFractal():
                 count+=1
 
             if (a,b) in memory:
-                color = (255, 0, 255)
+                color = (0, 0, 255)
             elif distance >= 200:
                 rate = (zMemory[-1]/zMemory[-2])/200
                 if(rate > 1):
                     rate = 1
-                color = (int(255), int(255 * rate), int(255))
+                color = (int(255*rate), int(255 * rate), int(255))
             else:
                 color = (0,0,0)
             fract.putpixel((x, y), color)
@@ -54,6 +54,7 @@ def FractalFunction(x, y, zx_0, zy_0):
     outputs tuple in form a+bi
     """
     a, b = multiply(x,y,x,y)
+    a, b = multiply(a,b,x,y)
     return a + zx_0, b + zy_0
 
 def findMagnitude(x, y):
