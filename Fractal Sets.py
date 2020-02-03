@@ -3,10 +3,10 @@ from PIL import ImageColor
 import numpy as np
 
 def createFractal():
-    xRange = 3
-    yRange = 2
-    XPixels = 3000
-    YPixels = 2000
+    xRange = 10
+    yRange = 10
+    XPixels = 1000
+    YPixels = 666
     fract = Image.new('RGBA', (XPixels, YPixels))
     Picture_Width, Picture_Height = fract.size
     Pixels_Per_Xunit = Picture_Width/(2*xRange)
@@ -53,9 +53,37 @@ def FractalFunction(x, y, zx_0, zy_0):
     Inputs are of the form x+yi
     outputs tuple in form a+bi
     """
+    x, y = cos(x, y)
     a, b = multiply(x,y,x,y)
-    a, b = multiply(a,b,x,y)
     return a + zx_0, b + zy_0
+
+def exp(x, y):
+    #e^(x+yi)
+    return np.exp(x)*np.cos(y), np.exp(x)*np.sin(y)
+
+def cos(x, y):
+    a,b = exp(x,y)
+    c,d = exp(-x,-y)
+    a = a+c
+    b = b+d
+    return a/2, b/2
+
+def division(x, y, c):
+    """
+    input: x+yi and some constant c.
+    Output: (x+yi)/(ci)
+    """
+    a = -1* y / c
+    b = c/a
+    return a,b
+
+def sin(x, y):
+    a,b = exp(x,y)
+    c,d = exp(-x,-y)
+    a = a-c
+    b = b-d
+    a, b = disision(a, b, 2)
+    return a, b
 
 def findMagnitude(x, y):
     return np.sqrt(1.0 * (x**2 + y**2))
