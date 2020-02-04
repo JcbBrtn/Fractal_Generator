@@ -3,10 +3,10 @@ from PIL import ImageColor
 import numpy as np
 
 def createFractal():
-    xRange = 10
-    yRange = 10
-    XPixels = 1000
-    YPixels = 666
+    xRange = 4
+    yRange = 8
+    XPixels = 500
+    YPixels = 1000
     fract = Image.new('RGBA', (XPixels, YPixels))
     Picture_Width, Picture_Height = fract.size
     Pixels_Per_Xunit = Picture_Width/(2*xRange)
@@ -27,7 +27,7 @@ def createFractal():
             color = (0, 0, 0)
             distance = -1
             
-            while(count < 25 and (distance < 500) and not((a,b) in memory)):
+            while(count < 100 and (distance < 200) and not((a,b) in memory)):
                 #print(aStart, bStart, a , b , distance)
                 memory.append((a,b))
                 distance = findMagnitude(a,b)
@@ -36,26 +36,33 @@ def createFractal():
                 count+=1
 
             if (a,b) in memory:
-                color = (0, 0, 255)
+                color = (0, 127, 255)
             elif distance >= 200:
-                rate = (zMemory[-1]/zMemory[-2])/200
+                rate = (zMemory[-1]/zMemory[-2])/400
                 if(rate > 1):
                     rate = 1
-                color = (int(255*rate), int(255 * rate), int(255))
+                if 285 - (255*rate) > 255:
+                    blue = 255
+                else:
+                    blue = 285 - (255*rate)
+                color = (int(blue), int((255 - 255 * rate)), int(0))
             else:
-                color = (0,0,0)
+                color = (255,255,255)
             fract.putpixel((x, y), color)
-    fract.save("Fractal.png")
+    fract.save("sin c=-0.09+0i.png")
     fract.show()
 
-def FractalFunction(x, y, zx_0, zy_0):
+def FractalFunction(x, y, zx, zy):
     """
     Inputs are of the form x+yi
+    zx, zy are first(base) values
+    i is the iteration number
     outputs tuple in form a+bi
     """
-    x, y = cos(x, y)
-    a, b = multiply(x,y,x,y)
-    return a + zx_0, b + zy_0
+    a, b = sin(x,y)
+    #return a + c, b + d
+    v, w = multiply(a, b, -.09, 0)
+    return v, w
 
 def exp(x, y):
     #e^(x+yi)
@@ -74,7 +81,7 @@ def division(x, y, c):
     Output: (x+yi)/(ci)
     """
     a = -1* y / c
-    b = c/a
+    b = c/x
     return a,b
 
 def sin(x, y):
@@ -82,7 +89,7 @@ def sin(x, y):
     c,d = exp(-x,-y)
     a = a-c
     b = b-d
-    a, b = disision(a, b, 2)
+    a, b = division(a, b, 2)
     return a, b
 
 def findMagnitude(x, y):
