@@ -3,9 +3,9 @@ from PIL import ImageColor
 import numpy as np
 
 def createFractal():
-    xRange = 4
-    yRange = 8
-    XPixels = 500
+    xRange = 2
+    yRange = 2
+    XPixels = 1000
     YPixels = 1000
     fract = Image.new('RGBA', (XPixels, YPixels))
     Picture_Width, Picture_Height = fract.size
@@ -16,6 +16,8 @@ def createFractal():
     zMemory = []
     color = (0,0,0)
     distance = -1
+    bailout = 2
+    maxcount = 100
     
     for x in range(Picture_Width):
         for y in range(Picture_Height):
@@ -27,7 +29,7 @@ def createFractal():
             color = (0, 0, 0)
             distance = -1
             
-            while(count < 100 and (distance < 200) and not((a,b) in memory)):
+            while(count < maxcount and (distance < bailout) and not((a,b) in memory)):
                 #print(aStart, bStart, a , b , distance)
                 memory.append((a,b))
                 distance = findMagnitude(a,b)
@@ -36,17 +38,14 @@ def createFractal():
                 count+=1
 
             if (a,b) in memory:
-                color = (0, 127, 255)
-            elif distance >= 200:
-                rate = (zMemory[-1]/zMemory[-2])/400
-                if(rate > 1):
-                    rate = 1
-                if 285 - (255*rate) > 255:
-                    blue = 255
-                else:
-                    blue = 285 - (255*rate)
-                color = (int(blue), int((255 - 255 * rate)), int(0))
+                color = (0, 0, 0)
+            elif distance >= 2:
+                rateColor = int(255 - (maxcount /(count + 1)))
+                color = (rateColor, rateColor, rateColor)
+            elif (count >= maxcount):
+                color = (0,0,0)
             else:
+                print('else')
                 color = (255,255,255)
             fract.putpixel((x, y), color)
     fract.save("sin c=-0.09+0i.png")
@@ -59,10 +58,9 @@ def FractalFunction(x, y, zx, zy):
     i is the iteration number
     outputs tuple in form a+bi
     """
-    a, b = sin(x,y)
+    a, b = multiply(x,y,x,y)
     #return a + c, b + d
-    v, w = multiply(a, b, -.09, 0)
-    return v, w
+    return a + zx, b+zy
 
 def exp(x, y):
     #e^(x+yi)
@@ -75,7 +73,7 @@ def cos(x, y):
     b = b+d
     return a/2, b/2
 
-def division(x, y, c):
+def fakeDiv(x, y, c):
     """
     input: x+yi and some constant c.
     Output: (x+yi)/(ci)
@@ -84,16 +82,28 @@ def division(x, y, c):
     b = c/x
     return a,b
 
-def sin(x, y):
+def fakeSin(x, y):
+    """
+    Not the real sin function for complex numbers.
+    However, it still produced a notable result and thus should be looked into further.
+    """
     a,b = exp(x,y)
     c,d = exp(-x,-y)
     a = a-c
     b = b-d
-    a, b = division(a, b, 2)
+    a, b = fakeDiv(a, b, 2)
     return a, b
 
 def findMagnitude(x, y):
     return np.sqrt(1.0 * (x**2 + y**2))
+
+def division(x,y,a,b):
+    """
+    defined as x+yi / a + bi
+    """
+    real = (a*x + b*y)/(a*a + b*b)
+    img = (a*y - b*x)/(a*a + b*b)
+    return real, img
 
 def multiply(x, y, a, b):
     """
