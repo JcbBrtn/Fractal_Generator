@@ -5,8 +5,10 @@ import numpy as np
 def createFractal():
     xRange = 2
     yRange = 2
+    centerX = 0.0
+    centerY = 0.0
     XPixels = 1000
-    YPixels = 1000
+    YPixels = 500
     fract = Image.new('RGBA', (XPixels, YPixels))
     Picture_Width, Picture_Height = fract.size
     Pixels_Per_Xunit = Picture_Width/(2*xRange)
@@ -16,13 +18,17 @@ def createFractal():
     zMemory = []
     color = (0,0,0)
     distance = -1
+    log2 = np.log(2)
     bailout = 2
-    maxcount = 100
+    maxcount = 50
+    fileName = 'Julia Set 2.png'
     
     for x in range(Picture_Width):
         for y in range(Picture_Height):
-            aStart = a = 1.0 * x/(Pixels_Per_Xunit) - xRange
-            bStart = b = -1.0*y/(Pixels_Per_Yunit) + yRange
+            #aStart = a = 1.0 * x/(Pixels_Per_Xunit) - xRange
+            #bStart = b = -1.0*y/(Pixels_Per_Yunit) + yRange
+            aStart = a = 1.0 * xRange/XPixels * x + (centerX - xRange/2)
+            bStart = b = 1.0 * yRange/YPixels * y + (centerY - yRange/2)
             count = 0
             memory = []
             zMemory = []
@@ -39,16 +45,19 @@ def createFractal():
 
             if (a,b) in memory:
                 color = (0, 0, 0)
-            elif distance >= 2:
-                rateColor = int(255 - (maxcount /(count + 1)))
-                color = (rateColor, rateColor, rateColor)
+            elif distance >= bailout:
+
+                rateColor = np.log(np.log(abs(a*a + b*b)))/log2
+                color = (255, int(255 * rateColor), int(255 * rateColor))
+                
             elif (count >= maxcount):
                 color = (0,0,0)
             else:
                 print('else')
                 color = (255,255,255)
             fract.putpixel((x, y), color)
-    fract.save("sin c=-0.09+0i.png")
+    fract.putpixel((int(XPixels/2), int(YPixels/2)), (255,255,0))
+    fract.save(fileName)
     fract.show()
 
 def FractalFunction(x, y, zx, zy):
@@ -60,7 +69,7 @@ def FractalFunction(x, y, zx, zy):
     """
     a, b = multiply(x,y,x,y)
     #return a + c, b + d
-    return a + zx, b+zy
+    return a + 0.3, b -0.01
 
 def exp(x, y):
     #e^(x+yi)
@@ -91,8 +100,8 @@ def fakeSin(x, y):
     c,d = exp(-x,-y)
     a = a-c
     b = b-d
-    a, b = fakeDiv(a, b, 2)
-    return a, b
+    w, v = fakeDiv(a, b, 2)
+    return w, v
 
 def findMagnitude(x, y):
     return np.sqrt(1.0 * (x**2 + y**2))
