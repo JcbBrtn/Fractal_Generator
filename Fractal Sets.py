@@ -3,11 +3,11 @@ from PIL import ImageColor
 import numpy as np
 
 def createFractal():
-    xRange = 2
-    yRange = 2
-    centerX = 0.0
-    centerY = 0.0
-    XPixels = 1000
+    xRange = 0.75
+    yRange = 0.75
+    centerX = 0.322
+    centerY = -1.332
+    XPixels = 500
     YPixels = 500
     fract = Image.new('RGBA', (XPixels, YPixels))
     Picture_Width, Picture_Height = fract.size
@@ -19,9 +19,9 @@ def createFractal():
     color = (0,0,0)
     distance = -1
     log2 = np.log(2)
-    bailout = 2
+    bailout = 50
     maxcount = 50
-    fileName = 'Julia Set 2.png'
+    fileName = 'exp zoomed in.png'
     
     for x in range(Picture_Width):
         for y in range(Picture_Height):
@@ -47,7 +47,7 @@ def createFractal():
                 color = (0, 0, 0)
             elif distance >= bailout:
 
-                rateColor = np.log(np.log(abs(a*a + b*b)))/log2
+                rateColor = 1.0*count/maxcount
                 color = (255, int(255 * rateColor), int(255 * rateColor))
                 
             elif (count >= maxcount):
@@ -67,9 +67,9 @@ def FractalFunction(x, y, zx, zy):
     i is the iteration number
     outputs tuple in form a+bi
     """
-    a, b = multiply(x,y,x,y)
+    a, b = exp(x,y)
     #return a + c, b + d
-    return a + 0.3, b -0.01
+    return a, b
 
 def exp(x, y):
     #e^(x+yi)
